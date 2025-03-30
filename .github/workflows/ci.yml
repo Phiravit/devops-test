@@ -1,10 +1,12 @@
-name: CI Test Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
   pull_request:
+    branches:
+      - main
 
 jobs:
   build-and-test:
@@ -13,9 +15,24 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Simulate Build
-        run: echo "Building project..."
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
 
-      - name: Simulate Test
-        run: echo "Running tests... ✅"
+      - name: Install dependencies
+        run: |
+          pip install -r app/requirements.txt
+
+      - name: Run tests
+        run: |
+          pytest tests/  # Run actual tests (assuming you have a "tests" folder)
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # Deploy only on main branch
+    steps:
+      - name: Deploy to Server
+        run: echo "Deploying application... 🚀"  
 
